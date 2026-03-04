@@ -1,34 +1,18 @@
 import streamlit as st
 from playwright.sync_api import sync_playwright
 import os
-import subprocess
-import sys
-
-# --- FORCE PLAYWRIGHT INSTALLATION ---
-# This sets the path to a folder inside your app directory
-os.environ["PLAYWRIGHT_BROWSERS_PATH"] = os.path.join(os.getcwd(), "pw-browsers")
-
-def install_playwright():
-    # Only install if the browser folder doesn't exist
-    if not os.path.exists(os.environ["PLAYWRIGHT_BROWSERS_PATH"]):
-        with st.spinner("Installing browser... please wait. This happens only once."):
-            # Install the browser
-            subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"])
-            # Install the linux dependencies
-            subprocess.run([sys.executable, "-m", "playwright", "install-deps"])
 
 CADERNETA_SITE = r"https://www.predialonline.pt/PredialOnline/FRM005RPOLCP_input.action"
 BUILDING_CODE = "PA-3267-07514-131728-007612"
 
-# --- PAGE CONFIG ---
 st.set_page_config(page_title="Document Scraper", page_icon="📂")
-install_playwright()
 
 st.title("📂 Automated Document Downloader")
 st.write("Enter the building code below to fetch the document.")
 
 # 1. User Input
-building_code = st.text_input("Building Code (codigoCertidao):", placeholder="e.g., 12345678", value=BUILDING_CODE)
+building_code = st.text_input(
+    "Building Code (codigoCertidao):", placeholder="e.g., 12345678", value=BUILDING_CODE)
 
 # 2. Execution Trigger
 if st.button("Download Document"):
@@ -40,7 +24,16 @@ if st.button("Download Document"):
             try:
                 with sync_playwright() as p:
                     # Headless=True is mandatory for hosting
-                    browser = p.chromium.launch(headless=True)
+                    browser = p.chromium.launch(
+                        headless=True,
+                        args=[
+                            "--no-sandbox",
+                            "--disable-dev-shm-usage",  # Mandatory for Docker
+                            "--disable-gpu",           # Saves memory
+                            "--disable-extensions",    # Saves memory
+                            "--single-process"         # Optional: keeps memory usage in one thread
+                        ]
+                    )
                     context = browser.new_context()
                     page = context.new_page()
 
@@ -88,7 +81,8 @@ if st.button("Download Document"):
                             # Clean up file from server memory
                             os.remove(temp_path)
                         else:
-                            st.error("❌ The download link did not appear. Is the session valid?")
+                            st.error(
+                                "❌ The download link did not appear. Is the session valid?")
                     else:
                         st.error(
                             "❌ Validation failed. The code might be incorrect or the site is busy.")
