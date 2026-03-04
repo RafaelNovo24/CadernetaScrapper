@@ -31,7 +31,7 @@ building_code = st.text_input(
     "Código da Caderneta Predial:", placeholder="e.g., 12345678", value=BUILDING_CODE)
 
 # Button to trigger the download process
-if st.button("Download Documento"):
+if st.button("Procurar Documento"):
     if not building_code:
         st.warning("Por favor, insira um código válido primeiro.")
     else:
@@ -53,10 +53,10 @@ if st.button("Download Documento"):
                     context = browser.new_context()
                     page = context.new_page()
 
-                    st.write("🌐 Acessando o site...")
+                    st.write("🌐 A ligar ao site...")
                     page.goto(CADERNETA_SITE)
 
-                    st.write("📝 Inserindo código...")
+                    st.write("📝 A inserir código...")
                     page.fill("input[name='codigoCertidao']", building_code)
 
                     # Validate code and navigate to the next page
