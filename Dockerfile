@@ -10,8 +10,8 @@ RUN playwright install chromium --with-deps
 COPY . .
 
 # Render uses the PORT environment variable automatically
-EXPOSE 8501
+EXPOSE 8000
 
-CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+CMD ["streamlit", "run", "app.py", "--server.port=8000", "--server.address=0.0.0.0"]
 
-# docker run -p 8501:8501 my-app   
+# docker run -p 8000:8000 my-app   
