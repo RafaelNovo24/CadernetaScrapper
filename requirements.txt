@@ -1,2 +1,2 @@
 streamlit
-playwright==1.40.0
+pytest-playwright
