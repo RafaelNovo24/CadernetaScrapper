@@ -1,10 +1,18 @@
 import streamlit as st
 from playwright.sync_api import sync_playwright
-import os
+import subprocess
+import sys
 
 CADERNETA_SITE = r"https://www.predialonline.pt/PredialOnline/FRM005RPOLCP_input.action"
 BUILDING_CODE = "PA-3267-07514-131728-007612"
 
+
+@st.cache_resource
+def install_playwright():
+    """Installs the Chromium browser for Playwright on first boot."""
+    subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"])
+
+install_playwright()
 st.set_page_config(page_title="Document Scraper", page_icon="📂")
 
 st.title("📂 Automated Document Downloader")
