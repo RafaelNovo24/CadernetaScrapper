@@ -12,8 +12,7 @@ st.title("📂 Automated Document Downloader")
 st.write("Enter the building code below to fetch the document.")
 
 # 1. User Input
-building_code = st.text_input(
-    "Building Code (codigoCertidao):", placeholder="e.g., 12345678")
+building_code = st.text_input("Building Code (codigoCertidao):", placeholder="e.g., 12345678", value=BUILDING_CODE)
 
 # 2. Execution Trigger
 if st.button("Download Document"):
@@ -52,10 +51,10 @@ if st.button("Download Document"):
                             "a[title='Efetuar Download']")
                         if btn_download.is_visible():
                             st.write("⬇️ Generating PDF...")
-                            with page.expect_download(timeout=20000) as download_info:
+                            with page.expect_download(timeout=20000) as dwn_inf:
                                 btn_download.click(force=True)
 
-                            download = download_info.value
+                            download = dwn_inf.value
                             temp_path = f"./{download.suggested_filename}"
                             download.save_as(temp_path)
 
@@ -73,8 +72,7 @@ if st.button("Download Document"):
                             # Clean up file from server memory
                             os.remove(temp_path)
                         else:
-                            st.error(
-                                "❌ The download link did not appear. Is the session valid?")
+                            st.error("❌ The download link did not appear. Is the session valid?")
                     else:
                         st.error(
                             "❌ Validation failed. The code might be incorrect or the site is busy.")
@@ -84,4 +82,4 @@ if st.button("Download Document"):
                 st.error(f"🚨 Error: {str(e)}")
 
 st.divider()
-st.caption("Public tool. No login required.")
+st.write("Made with ❤️ by Catarina & Rafael")
