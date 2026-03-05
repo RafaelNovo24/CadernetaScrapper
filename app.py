@@ -1,10 +1,9 @@
-import base64
-
-import streamlit as st
-from playwright.sync_api import sync_playwright
+""" Module to extract Pdf from Predial Online using Playwright and Streamlit for UI. """
 import subprocess
 import sys
 import os
+from playwright.sync_api import sync_playwright
+import streamlit as st
 
 CADERNETA_SITE = r"https://www.predialonline.pt/PredialOnline/FRM005RPOLCP_input.action"
 BUILDING_CODE = "PA-3267-07514-131728-007612"
@@ -13,7 +12,7 @@ BUILDING_CODE = "PA-3267-07514-131728-007612"
 @st.cache_resource
 def install_playwright():
     """Installs the Chromium browser for Playwright on first boot."""
-    subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"])
+    subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], check=True)
 
 
 install_playwright()
@@ -36,7 +35,7 @@ if st.button("Procurar Documento"):
         st.warning("Por favor, insira um código válido primeiro.")
     else:
         # Use a status container to show progress
-        with st.status("Inicializando o Scraper...", expanded=True) as status:
+        with st.status("Arrancar o Scraper...", expanded=True) as status:
             try:
                 with sync_playwright() as p:
                     # Headless=True is mandatory for hosting
@@ -45,9 +44,9 @@ if st.button("Procurar Documento"):
                         args=[
                             "--no-sandbox",
                             "--disable-dev-shm-usage",  # Mandatory for Docker
-                            "--disable-gpu",           # Saves memory
-                            "--disable-extensions",    # Saves memory
-                            "--single-process"         # Optional: keeps memory usage in one thread
+                            "--disable-gpu",            # Saves memory
+                            "--disable-extensions",     # Saves memory
+                            "--single-process"          # Optional: keeps memory usage in one thread
                         ]
                     )
                     context = browser.new_context()
@@ -80,14 +79,14 @@ if st.button("Procurar Documento"):
                                 btn_download.click(force=True)
 
                             download = dwn_inf.value
-                            temp_path = f"./{download.suggested_filename}"
-                            download.save_as(temp_path)
+                            TEMP_PATH = f"./{download.suggested_filename}"
+                            download.save_as(TEMP_PATH)
 
                             status.update(label="✅ Sucesso!",
                                           state="complete", expanded=True)
 
-                            # 3. Provide file to the user
-                            with open(temp_path, "rb") as f:
+                            # Allow to download file locally through Streamlit
+                            with open(TEMP_PATH, "rb") as f:
                                 st.download_button(
                                     label="💾 Guardar documento localmente",
                                     data=f,
@@ -96,7 +95,7 @@ if st.button("Procurar Documento"):
                                 )
 
                             # Clean up file from server memory
-                            os.remove(temp_path)
+                            os.remove(TEMP_PATH)
                         else:
                             st.error(
                                 "❌ O link de download não apareceu. A sessão é válida?")
@@ -110,7 +109,6 @@ if st.button("Procurar Documento"):
 
 
 st.divider()
-# st.write("© 2026 Rafael Novo. All rights reserved.")
 
 # Footnote with RN logo
 st.markdown(
@@ -130,5 +128,4 @@ st.markdown(
                     <path d="M 215 160 C 205 160 200 165 200 175 V 185 C 200 190 195 195 185 195 C 195 195 200 200 200 205 V 215 C 200 225 205 230 215 230" fill="none" stroke="url(#logo-grad)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
                     <path d="M 240 160 L 275 195 L 240 230" fill="none" stroke="url(#logo-grad)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
-                <div style="font-size:0.8em; color:#888;">RN</div>
         </div>''', unsafe_allow_html=True)
