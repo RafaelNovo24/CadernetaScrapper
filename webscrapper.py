@@ -4,7 +4,7 @@ BUILDING_CODE = "PA-3267-07514-131728-007612"
 #   pyinstaller --onefile --windowed --add-data "env/Lib/site-packages/playwright/driver:playwright/driver" webscrapper.py
 
 
-def consultar_codigo():
+def get_certificate():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=False)
         context = browser.new_context()
@@ -41,4 +41,4 @@ def consultar_codigo():
 
 
 if __name__ == "__main__":
-    consultar_codigo()
+    get_certificate()
