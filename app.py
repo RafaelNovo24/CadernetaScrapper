@@ -4,6 +4,7 @@ import sys
 import os
 from playwright.sync_api import sync_playwright
 import streamlit as st
+from pdf_verification import compare_pdf
 
 CADERNETA_SITE = r"https://www.predialonline.pt/PredialOnline/FRM005RPOLCP_input.action"
 BUILDING_CODE = "PA-3267-07514-131728-007612"
@@ -96,6 +97,14 @@ if st.button("Procurar Documento"):
 
                             # Clean up file from server memory
                             os.remove(TEMP_PATH)
+
+                            # Verify PDF content
+                            st.write("🔍 A verificar conteúdo do PDF...")
+                            if compare_pdf(TEMP_PATH):
+                                st.success("✅ Caderneta não possui registos pendentes.")
+                            else:
+                                st.error("❌ Há registos pendentes.")
+
                         else:
                             st.error(
                                 "❌ O link de download não apareceu. A sessão é válida?")
@@ -104,6 +113,8 @@ if st.button("Procurar Documento"):
                             "❌ A validação falhou. O código pode estar incorreto ou o site está ocupado.")
 
                     browser.close()
+
+
             except Exception as e:
                 st.error(f"🚨 Erro: {str(e)}")
 
