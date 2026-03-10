@@ -29,7 +29,7 @@ def get_certificate():
                     btn_download.click(force=True)
 
                 download = download_info.value
-                path = f"./{download.suggested_filename}"
+                path = "./caderneta.pdf"
                 download.save_as(path)
                 print(f"Success! File saved as: {path}")
             except Exception as e:
